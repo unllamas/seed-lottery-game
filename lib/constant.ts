@@ -1,0 +1,1 @@
+export const SATOSHI_NUMBER_ADDRESS = 12;
