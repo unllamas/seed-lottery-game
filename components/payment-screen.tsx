@@ -115,7 +115,7 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
             transition={{ delay: 0.6, duration: 0.5 }}
           >
             <p>Al jugar, aceptas los términos y condiciones del servicio.</p>
-            <p>La Crypta © 2023 - Todos los derechos reservados</p>
+            <p>@unllamas - Todos los derechos reservados</p>
           </motion.div>
         </CardContent>
       </div>
