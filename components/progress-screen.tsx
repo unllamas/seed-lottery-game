@@ -33,11 +33,11 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         for (let i = 0; i < steps.length; i++) {
           setCurrentStep(i);
           setStatusMessage(steps[i]);
-          setProgress(Math.floor((i / (steps.length + 30)) * 100));
+          setProgress(Math.floor((i / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
           await new Promise((resolve) => setTimeout(resolve, 500));
         }
 
-        // Paso 2: Generar las 30 direcciones reales
+        // Paso 2: Generar las SATOSHI_NUMBER_ADDRESS direcciones reales
         setStatusMessage('🔄 Generando direcciones Bitcoin...');
         const generatedAddresses = await generateMultipleSegWitAddresses(mnemonic, SATOSHI_NUMBER_ADDRESS);
         setAddresses(generatedAddresses);
@@ -46,7 +46,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         for (let i = 0; i < generatedAddresses.length; i++) {
           setCurrentStep(steps.length + i);
           setStatusMessage(`🔍 Verificando dirección #${i + 1}...`);
-          setProgress(Math.floor(((steps.length + i) / (steps.length + 30)) * 100));
+          setProgress(Math.floor(((steps.length + i) / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
 
           // Verificar el balance real usando la función checkAddressBalance
           const balance = await checkAddressBalance(generatedAddresses[i]);
@@ -95,7 +95,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         </CardHeader>
         <CardContent className='space-y-6'>
           <motion.div
-            className='flex flex-col items-center justify-center p-6 bg-orange-500/10 rounded-lg border border-orange-500/20'
+            className='flex flex-col items-center justify-center p-6 bg-orange-500/10 rounded-lg'
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}

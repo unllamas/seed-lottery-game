@@ -41,9 +41,25 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
   }, [success]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='w-full max-w-md'>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='w-full'>
       <div>
         <CardHeader>
+          {success && (
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: 'easeInOut',
+              }}
+              className='mb-4 mx-auto'
+            >
+              <Trophy className='h-12 w-12 text-green-500' />
+            </motion.div>
+          )}
           <CardTitle className={`text-center ${success ? 'text-green-500' : 'text-orange-500'} text-shadow`}>
             {success ? '¡Felicitaciones!' : 'Suerte para la próxima'}
           </CardTitle>
@@ -57,25 +73,11 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
           {success ? (
             <>
               <motion.div
-                className='p-6 bg-green-500/10 rounded-lg border border-green-500/20 flex flex-col items-center'
+                className='p-6 bg-green-500/10 rounded-lg flex flex-col items-center'
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <motion.div
-                  animate={{
-                    y: [0, -10, 0],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: 'easeInOut',
-                  }}
-                  className='mb-4'
-                >
-                  <Trophy className='h-12 w-12 text-green-500' />
-                </motion.div>
                 <div className='text-center mb-4'>
                   <p className='text-green-500 font-medium'>¡Has ganado!</p>
                   <motion.div
@@ -151,7 +153,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
             </>
           ) : (
             <motion.div
-              className='p-6 bg-orange-500/10 rounded-lg border border-orange-500/20 flex flex-col items-center'
+              className='p-6 bg-orange-500/10 rounded-lg flex flex-col items-center'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}

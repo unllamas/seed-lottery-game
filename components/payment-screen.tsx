@@ -34,6 +34,11 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
     >
       <div>
         <CardHeader className='text-center'>
+          <motion.div className='float-effect'>
+            <div className='w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg'>
+              <Zap className='h-10 w-10 text-white' />
+            </div>
+          </motion.div>
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -51,23 +56,18 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
         </CardHeader>
         <CardContent className='space-y-6'>
           <motion.div
-            className='p-6 bg-orange-500/10 rounded-lg border border-orange-500/20 text-center'
+            className='p-6 bg-orange-500/10 rounded-lg text-center'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            <motion.div className='float-effect'>
-              <div className='w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg'>
-                <Zap className='h-10 w-10 text-white' />
-              </div>
-            </motion.div>
             <h3 className='text-lg font-medium text-orange-500 mb-2'>¿Cómo funciona?</h3>
             <p className='text-sm mb-4'>
               Paga 1,000 satoshis y genera una semilla aleatoria. Si alguna de las {SATOSHI_NUMBER_ADDRESS} primeras
               direcciones derivadas tiene balance, ¡te llevas todo lo que contenga!
             </p>
             <motion.div
-              className='bg-card p-3 rounded-lg border border-orange-500/20 mb-4'
+              className='bg-card p-3 rounded-lg mb-4'
               whileHover={{ scale: 1.02 }}
               transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
