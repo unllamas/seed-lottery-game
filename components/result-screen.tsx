@@ -1,14 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { ExternalLink, RefreshCw, Trophy, XCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { ExternalLink, Clock, RefreshCw, Trophy, XCircle } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { motion } from '@/components/ui/motion';
-import { SATOSHI_NUMBER_ADDRESS } from '@/lib/constant';
 
 interface ResultScreenProps {
   success: boolean;
@@ -22,28 +18,10 @@ interface ResultScreenProps {
 }
 
 export default function ResultScreen({ success, mnemonic, addressWithBalance, onPlayAgain }: ResultScreenProps) {
-  const [timeLeft, setTimeLeft] = useState(30);
-
-  useEffect(() => {
-    if (success) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [success]);
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='w-full'>
       <div>
-        <CardHeader>
+        <div className='flex flex-col gap-2 py-6'>
           {success && (
             <motion.div
               animate={{
@@ -60,16 +38,20 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
               <Trophy className='h-12 w-12 text-green-500' />
             </motion.div>
           )}
-          <CardTitle className={`text-center ${success ? 'text-green-500' : 'text-orange-500'} text-shadow`}>
+          <h2
+            className={`text-2xl font-semibold leading-none tracking-tight text-center ${
+              success ? 'text-green-500' : 'text-orange-500'
+            } text-shadow`}
+          >
             {success ? '¡Felicitaciones!' : 'Suerte para la próxima'}
-          </CardTitle>
-          <CardDescription className='text-center'>
+          </h2>
+          <p className='text-sm text-muted-foreground text-center'>
             {success
               ? 'Has encontrado una dirección con balance'
               : 'No se encontró balance en ninguna de las direcciones'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='space-y-6'>
+          </p>
+        </div>
+        <div className='space-y-6'>
           {success ? (
             <>
               <motion.div
@@ -117,27 +99,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
-                  >
-                    <p className='text-sm font-medium text-muted-foreground mb-2'>
-                      Escanea este código QR para guardar tu semilla:
-                    </p>
-                    <motion.div
-                      className='bg-white p-4 rounded-lg border border-green-500/20'
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                    >
-                      <QRCodeSVG value={mnemonic} size={180} />
-                    </motion.div>
-                    <div className='mt-4 w-full'>
-                      <div className='flex items-center justify-between mb-1'>
-                        <p className='text-xs text-muted-foreground flex items-center'>
-                          <Clock className='h-3 w-3 mr-1' /> Tiempo restante:
-                        </p>
-                        <p className='text-xs font-medium text-muted-foreground'>{timeLeft} segundos</p>
-                      </div>
-                      <Progress value={(timeLeft / 30) * 100} className='h-2 bg-gray-200/20 progress-shine' />
-                    </div>
-                  </motion.div>
+                  ></motion.div>
                 </div>
               </motion.div>
 
@@ -177,7 +139,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
-                No se encontró ninguna dirección con balance entre las primeras {SATOSHI_NUMBER_ADDRESS} derivaciones.
+                Balance no encontrado.
               </motion.p>
               <motion.p
                 className='text-center text-sm text-white'
@@ -189,15 +151,15 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
               </motion.p>
             </motion.div>
           )}
-        </CardContent>
-        <CardFooter>
+        </div>
+        <div className='flex items-center py-6'>
           <motion.div className='w-full' whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button onClick={onPlayAgain} className='w-full bg-orange-500 hover:bg-orange-600'>
               <RefreshCw className='mr-2 h-4 w-4' />
               Jugar de nuevo
             </Button>
           </motion.div>
-        </CardFooter>
+        </div>
       </div>
     </motion.div>
   );

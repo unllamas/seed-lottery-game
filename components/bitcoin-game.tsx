@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { generateMnemonic } from 'bip39';
+
 import PaymentScreen from '@/components/payment-screen';
 import ProgressScreen from '@/components/progress-screen';
 import ResultScreen from '@/components/result-screen';
@@ -46,24 +47,22 @@ export default function BitcoinGame() {
   };
 
   return (
-    <div className=''>
-      <AnimatePresence mode='wait'>
-        {gameState === GameState.PAYMENT && <PaymentScreen key='payment' onPaymentComplete={handlePaymentComplete} />}
+    <AnimatePresence mode='wait'>
+      {gameState === GameState.PAYMENT && <PaymentScreen key='payment' onPaymentComplete={handlePaymentComplete} />}
 
-        {gameState === GameState.PROGRESS && (
-          <ProgressScreen key='progress' mnemonic={mnemonic} onComplete={handleProgressComplete} />
-        )}
+      {gameState === GameState.PROGRESS && (
+        <ProgressScreen key='progress' mnemonic={mnemonic} onComplete={handleProgressComplete} />
+      )}
 
-        {gameState === GameState.RESULT && (
-          <ResultScreen
-            key='result'
-            success={hasBalance}
-            mnemonic={mnemonic}
-            addressWithBalance={addressWithBalance}
-            onPlayAgain={handlePlayAgain}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+      {gameState === GameState.RESULT && (
+        <ResultScreen
+          key='result'
+          success={hasBalance}
+          mnemonic={mnemonic}
+          addressWithBalance={addressWithBalance}
+          onPlayAgain={handlePlayAgain}
+        />
+      )}
+    </AnimatePresence>
   );
 }

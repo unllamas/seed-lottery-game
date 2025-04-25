@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
+
+import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from '@/components/ui/motion';
+
 import { generateMultipleSegWitAddresses, checkAddressBalance } from '@/actions/crypto-actions';
-import { SATOSHI_NUMBER_ADDRESS } from '../lib/constant';
+
+import { SATOSHI_NUMBER_ADDRESS } from '@/lib/constant';
 
 interface ProgressScreenProps {
   mnemonic: string;
@@ -14,10 +16,8 @@ interface ProgressScreenProps {
 }
 
 export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenProps) {
-  const [currentStep, setCurrentStep] = useState(0);
   const [statusMessage, setStatusMessage] = useState('Iniciando proceso...');
   const [progress, setProgress] = useState(0);
-  const [addresses, setAddresses] = useState<string[]>([]);
 
   useEffect(() => {
     const verifyAddresses = async () => {
@@ -31,7 +31,6 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         ];
 
         for (let i = 0; i < steps.length; i++) {
-          setCurrentStep(i);
           setStatusMessage(steps[i]);
           setProgress(Math.floor((i / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -40,11 +39,9 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         // Paso 2: Generar las SATOSHI_NUMBER_ADDRESS direcciones reales
         setStatusMessage('🔄 Generando direcciones Bitcoin...');
         const generatedAddresses = await generateMultipleSegWitAddresses(mnemonic, SATOSHI_NUMBER_ADDRESS);
-        setAddresses(generatedAddresses);
 
         // Paso 3: Verificar el balance de cada dirección
         for (let i = 0; i < generatedAddresses.length; i++) {
-          setCurrentStep(steps.length + i);
           setStatusMessage(`🔍 Verificando dirección #${i + 1}...`);
           setProgress(Math.floor(((steps.length + i) / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
 
@@ -53,7 +50,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
 
           // Si encontramos una dirección con balance, completamos el proceso
           if (balance > 0) {
-            setStatusMessage(`✨ ¡Balance encontrado en dirección #${i + 1}!`);
+            setStatusMessage(`🔥 ¡Balance encontrado!`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             onComplete(true, {
@@ -89,11 +86,13 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='w-full max-w-md'>
       <div>
-        <CardHeader>
-          <CardTitle className='text-center text-orange-500 text-shadow'>Verificando Direcciones</CardTitle>
-          <CardDescription className='text-center'>Buscando balance en las direcciones derivadas</CardDescription>
-        </CardHeader>
-        <CardContent className='space-y-6'>
+        <div className='flex flex-col gap-2 py-6'>
+          <h2 className='text-2xl font-semibold leading-none tracking-tight text-center text-orange-500 text-shadow'>
+            Verificando Direcciones
+          </h2>
+          <p className='text-sm text-muted-foreground text-center'>Buscando balance en las direcciones derivadas</p>
+        </div>
+        <div className='space-y-6 py-6'>
           <motion.div
             className='flex flex-col items-center justify-center p-6 bg-orange-500/10 rounded-lg'
             initial={{ y: 20, opacity: 0 }}
@@ -134,17 +133,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
               <p className='text-xs text-right mt-1 text-orange-400'>{progress}% completado</p>
             </div>
           </motion.div>
-
-          {/* <motion.div
-            className='p-4 bg-card/50 rounded-lg border border-border text-sm'
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            <p className='font-medium mb-2 text-muted-foreground'>Semilla generada:</p>
-            <p className='font-mono text-xs break-all'>{mnemonic}</p>
-          </motion.div> */}
-        </CardContent>
+        </div>
       </div>
     </motion.div>
   );
