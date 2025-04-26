@@ -6,6 +6,6 @@ export const siteConfig = {
 };
 
 export const lightningConfig = {
-  amount: 1,
+  amount: 2025,
   lnaddress: 'dios@lawallet.ar',
 };
