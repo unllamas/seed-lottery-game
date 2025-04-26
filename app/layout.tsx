@@ -1,16 +1,19 @@
 import type React from 'react';
-import './globals.css';
+import Script from 'next/script';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+
 import { ThemeProvider } from '@/components/theme-provider';
-import Script from 'next/script';
+
+import { siteConfig } from '@/config/site';
+
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Bitcoin Telequino',
-  description: 'Juega a la lotería Bitcoin y gana satoshis al instante',
-  generator: 'v0.dev',
+  title: siteConfig?.name,
+  description: siteConfig?.description,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
