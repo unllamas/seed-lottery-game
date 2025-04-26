@@ -12,10 +12,15 @@ import { SATOSHI_NUMBER_ADDRESS } from '@/lib/constant';
 
 interface ProgressScreenProps {
   mnemonic: string;
-  onComplete: (hasBalance: boolean, addressWithBalance?: { address: string; balance: number; index: number }) => void;
+  addressCount: number;
+  onComplete: (
+    hasBalance: boolean,
+    addressWithBalance?: { address: string; balance: number; index: number },
+    checkedAddresses?: string[],
+  ) => void;
 }
 
-export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenProps) {
+export default function ProgressScreen({ mnemonic, addressCount, onComplete }: ProgressScreenProps) {
   const [statusMessage, setStatusMessage] = useState('Starting process...');
   const [progress, setProgress] = useState(0);
 
@@ -32,33 +37,52 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
 
         for (let i = 0; i < steps.length; i++) {
           setStatusMessage(steps[i]);
-          setProgress(Math.floor((i / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
+          setProgress(Math.floor((i / (steps.length + addressCount)) * 100));
           await new Promise((resolve) => setTimeout(resolve, 500));
         }
 
-        // Paso 2: Generar las SATOSHI_NUMBER_ADDRESS direcciones reales
-        setStatusMessage('🔄 Generating Bitcoin addresses...');
-        const generatedAddresses = await generateMultipleSegWitAddresses(mnemonic, SATOSHI_NUMBER_ADDRESS);
+        // Paso 2: Generar las direcciones reales
+        setStatusMessage(`🔄 Generating ${addressCount} Bitcoin addresses...`);
+        let generatedAddresses: string[] = [];
+
+        try {
+          generatedAddresses = await generateMultipleSegWitAddresses(mnemonic, addressCount);
+        } catch (genError) {
+          console.error('Error al generar direcciones:', genError);
+          setStatusMessage('❌ Error al generar direcciones. Retrying...');
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          // Intentar de nuevo con menos direcciones si falla
+          generatedAddresses = await generateMultipleSegWitAddresses(mnemonic, Math.min(addressCount, 20));
+        }
 
         // Paso 3: Verificar el balance de cada dirección
         for (let i = 0; i < generatedAddresses.length; i++) {
-          setStatusMessage(`🔍 Verifying address #${i + 1}...`);
-          setProgress(Math.floor(((steps.length + i) / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
+          setStatusMessage(`🔍 Verifying address #${i + 1} of ${generatedAddresses.length}...`);
+          setProgress(Math.floor(((steps.length + i) / (steps.length + generatedAddresses.length)) * 100));
 
-          // Verificar el balance real usando la función checkAddressBalance
-          const balance = await checkAddressBalance(generatedAddresses[i]);
+          try {
+            // Verificar el balance real usando la función checkAddressBalance
+            const balance = await checkAddressBalance(generatedAddresses[i]);
 
-          // Si encontramos una dirección con balance, completamos el proceso
-          if (balance > 0) {
-            setStatusMessage(`🔥 Balance found!`);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            // Si encontramos una dirección con balance, completamos el proceso
+            if (balance > 0) {
+              setStatusMessage(`✨ Balance found in direction #${i + 1}!`);
+              await new Promise((resolve) => setTimeout(resolve, 1000));
 
-            onComplete(true, {
-              address: generatedAddresses[i],
-              balance: balance,
-              index: i,
-            });
-            return;
+              onComplete(
+                true,
+                {
+                  address: generatedAddresses[i],
+                  balance: balance,
+                  index: i,
+                },
+                generatedAddresses.slice(0, i + 1), // Pasar las direcciones verificadas hasta este punto
+              );
+              return;
+            }
+          } catch (balanceError) {
+            console.error(`Error checking address balance ${i}:`, balanceError);
+            // Continuar con la siguiente dirección en caso de error
           }
 
           // Pequeña pausa para evitar sobrecargar las APIs
@@ -66,13 +90,13 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         }
 
         // Si llegamos aquí, no se encontró balance en ninguna dirección
-        setStatusMessage('Complete verification.');
+        setStatusMessage('No balance found.');
         setProgress(100);
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        onComplete(false);
+        onComplete(false, undefined, generatedAddresses); // Pasar todas las direcciones verificadas
       } catch (error) {
         console.error('Error verifying addresses:', error);
-        setStatusMessage('❌ Error verifying addresses. Please try again..');
+        setStatusMessage('❌ Error verifying addresses. Try again.');
         await new Promise((resolve) => setTimeout(resolve, 1000));
         onComplete(false);
       }
@@ -81,7 +105,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
     if (mnemonic) {
       verifyAddresses();
     }
-  }, [mnemonic, onComplete]);
+  }, [mnemonic, addressCount, onComplete]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='w-full max-w-md'>
@@ -132,6 +156,15 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
               </div>
               <p className='text-xs text-right mt-1 text-orange-400'>{progress}% filled</p>
             </div>
+          </motion.div>
+          <motion.div
+            className='p-4 bg-card/50 rounded-lg border border-border text-sm'
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <p className='font-medium mb-2 text-muted-foreground'>Generated seed:</p>
+            <p className='font-mono text-xs break-all'>{mnemonic}</p>
           </motion.div>
         </div>
       </div>

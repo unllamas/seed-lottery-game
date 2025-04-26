@@ -7,6 +7,7 @@ import PaymentScreen from '@/components/payment-screen';
 import ProgressScreen from '@/components/progress-screen';
 import ResultScreen from '@/components/result-screen';
 import { AnimatePresence } from '@/components/ui/motion';
+import { lightningConfig } from '@/config/site';
 
 enum GameState {
   PAYMENT = 0,
@@ -25,6 +26,10 @@ export default function BitcoinGame() {
   const [mnemonic, setMnemonic] = useState<string>('');
   const [hasBalance, setHasBalance] = useState<boolean>(false);
   const [addressWithBalance, setAddressWithBalance] = useState<AddressWithBalance | undefined>(undefined);
+  const [checkedAddresses, setCheckedAddresses] = useState<string[]>([]);
+
+  // Número fijo de direcciones a verificar
+  const addressCount = lightningConfig?.derivations;
 
   const handlePaymentComplete = () => {
     // Generar una nueva semilla aleatoria
@@ -33,9 +38,10 @@ export default function BitcoinGame() {
     setGameState(GameState.PROGRESS);
   };
 
-  const handleProgressComplete = (foundBalance: boolean, foundAddress?: AddressWithBalance) => {
+  const handleProgressComplete = (foundBalance: boolean, foundAddress?: AddressWithBalance, addresses?: string[]) => {
     setHasBalance(foundBalance);
     setAddressWithBalance(foundAddress);
+    setCheckedAddresses(addresses || []);
     setGameState(GameState.RESULT);
   };
 
@@ -44,6 +50,7 @@ export default function BitcoinGame() {
     setMnemonic('');
     setHasBalance(false);
     setAddressWithBalance(undefined);
+    setCheckedAddresses([]);
   };
 
   return (
@@ -51,7 +58,12 @@ export default function BitcoinGame() {
       {gameState === GameState.PAYMENT && <PaymentScreen key='payment' onPaymentComplete={handlePaymentComplete} />}
 
       {gameState === GameState.PROGRESS && (
-        <ProgressScreen key='progress' mnemonic={mnemonic} onComplete={handleProgressComplete} />
+        <ProgressScreen
+          key='progress'
+          addressCount={addressCount}
+          mnemonic={mnemonic}
+          onComplete={handleProgressComplete}
+        />
       )}
 
       {gameState === GameState.RESULT && (
@@ -60,6 +72,7 @@ export default function BitcoinGame() {
           success={hasBalance}
           mnemonic={mnemonic}
           addressWithBalance={addressWithBalance}
+          checkedAddresses={checkedAddresses}
           onPlayAgain={handlePlayAgain}
         />
       )}
