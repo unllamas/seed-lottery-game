@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { motion } from '@/components/ui/motion';
 import { SatoshiIcon } from '@/components/icon/satoshi';
 
-import { SATOSHI_NUMBER_ADDRESS, VALUE_PER_GAME } from '@/lib/constant';
-import { siteConfig } from '@/config/site';
+import { SATOSHI_NUMBER_ADDRESS } from '@/lib/constant';
+import { lightningConfig, siteConfig } from '@/config/site';
+import LightningPaymentModal from './lightning-payment-modal';
+import { generateLightningInvoice } from '@/actions/lightning-actions';
 
 interface PaymentScreenProps {
   onPaymentComplete: () => void;
@@ -17,15 +19,41 @@ interface PaymentScreenProps {
 
 export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [invoice, setInvoice] = useState('');
+  const [verifyUrl, setVerifyUrl] = useState<string | undefined>();
+  const [error, setError] = useState<string | null>(null);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true);
+    setError(null);
 
-    // Simulamos el proceso de pago (en un entorno real, esto se conectaría a Lightning Network)
-    setTimeout(() => {
+    try {
+      // Generar un invoice Lightning usando LUD-16
+      const result = await generateLightningInvoice(
+        lightningConfig?.lnaddress,
+        lightningConfig?.amount,
+        siteConfig?.name,
+      );
+
+      if (result.success) {
+        setInvoice(result.invoice);
+        setVerifyUrl(result.verifyUrl);
+        setShowPaymentModal(true);
+      } else {
+        setError(result.error || 'Error al generar el invoice');
+      }
+    } catch (error) {
+      console.error('Error al iniciar el pago:', error);
+      setError(error instanceof Error ? error.message : 'Error al iniciar el pago');
+    } finally {
       setIsProcessing(false);
-      onPaymentComplete();
-    }, 2000);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    onPaymentComplete();
   };
 
   return (
@@ -78,7 +106,7 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
             <p className='text-sm font-medium text-muted-foreground'>Price per game:</p>
             <div className='flex items-center justify-center text-orange-500'>
               <SatoshiIcon className='size-6' />
-              <p className='text-2xl font-bold'>{VALUE_PER_GAME} SAT</p>
+              <p className='text-2xl font-bold'>{lightningConfig?.amount} SAT</p>
             </div>
           </motion.div>
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -118,6 +146,15 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
           </p>
         </motion.div>
       </div>
+
+      <LightningPaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        invoice={invoice}
+        verifyUrl={verifyUrl}
+        amount={lightningConfig?.amount}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
     </motion.div>
   );
 }
