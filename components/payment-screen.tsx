@@ -95,8 +95,8 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
         >
           <h3 className='text-lg font-medium text-orange-500 mb-2'>How does it work?</h3>
           <p className='text-sm mb-4'>
-            Pay Satoshis and generate a random seed. If any of the first {SATOSHI_NUMBER_ADDRESS} addresses derived have
-            a balance, you get everything inside!
+            Pay Satoshis and generate a random seed. If any of the first {SATOSHI_NUMBER_ADDRESS} addresses derived
+            Segwit Native have a balance, you get everything inside!
           </p>
           <motion.div
             className='bg-card p-3 rounded-lg mb-4'
