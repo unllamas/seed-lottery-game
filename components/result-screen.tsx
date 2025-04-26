@@ -43,12 +43,10 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
               success ? 'text-green-500' : 'text-orange-500'
             } text-shadow`}
           >
-            {success ? '¡Felicitaciones!' : 'Suerte para la próxima'}
+            {success ? 'Congratulations!' : 'Good luck next time'}
           </h2>
           <p className='text-sm text-muted-foreground text-center'>
-            {success
-              ? 'Has encontrado una dirección con balance'
-              : 'No se encontró balance en ninguna de las direcciones'}
+            {success ? 'You have found a balanced address' : 'No balance was found in either direction.'}
           </p>
         </div>
         <div className='space-y-6'>
@@ -61,7 +59,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                 transition={{ duration: 0.5 }}
               >
                 <div className='text-center mb-4'>
-                  <p className='text-green-500 font-medium'>¡Has ganado!</p>
+                  <p className='text-green-500 font-medium'>You have won!</p>
                   <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -80,7 +78,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.5 }}
                   >
-                    <p className='text-sm font-medium text-muted-foreground mb-2'>Dirección con balance:</p>
+                    <p className='text-sm font-medium text-muted-foreground mb-2'>Balanced steering:</p>
                     <div className='flex items-center'>
                       <p className='font-mono text-xs break-all'>{addressWithBalance?.address}</p>
                       <a
@@ -109,7 +107,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
-                <p className='font-medium mb-2 text-muted-foreground'>Tu semilla (guárdala en un lugar seguro):</p>
+                <p className='font-medium mb-2 text-muted-foreground'>Your seed (keep it in a safe place):</p>
                 <p className='font-mono text-xs break-all'>{mnemonic}</p>
               </motion.div>
             </>
@@ -139,7 +137,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
-                Balance no encontrado.
+                Balance not found.
               </motion.p>
               <motion.p
                 className='text-center text-sm text-white'
@@ -147,7 +145,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
               >
-                ¡Pero no te desanimes! Puedes intentarlo de nuevo con una nueva semilla.
+                But don't be discouraged! You can try again with a new seed.
               </motion.p>
             </motion.div>
           )}
@@ -156,7 +154,7 @@ export default function ResultScreen({ success, mnemonic, addressWithBalance, on
           <motion.div className='w-full' whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button onClick={onPlayAgain} className='w-full bg-orange-500 hover:bg-orange-600'>
               <RefreshCw className='mr-2 h-4 w-4' />
-              Jugar de nuevo
+              Play again
             </Button>
           </motion.div>
         </div>

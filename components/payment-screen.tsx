@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Loader2, Zap } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { motion } from '@/components/ui/motion';
 import { SatoshiIcon } from '@/components/icon/satoshi';
 
 import { SATOSHI_NUMBER_ADDRESS, VALUE_PER_GAME } from '@/lib/constant';
+import { siteConfig } from '@/config/site';
 
 interface PaymentScreenProps {
   onPaymentComplete: () => void;
@@ -45,7 +47,7 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <h1 className='text-3xl font-semibold leading-none tracking-tight text-center text-white text-shadow'>
-            Bitcoin Telequino
+            {siteConfig?.name}
           </h1>
         </motion.div>
         <motion.div
@@ -53,7 +55,7 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <p className='text-muted-foreground text-lg'>¡Descubrí si tu semilla es legendaria!</p>
+          <p className='text-muted-foreground text-lg'>{siteConfig?.description}</p>
         </motion.div>
       </div>
       <div className='space-y-6'>
@@ -63,17 +65,17 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <h3 className='text-lg font-medium text-orange-500 mb-2'>¿Cómo funciona?</h3>
+          <h3 className='text-lg font-medium text-orange-500 mb-2'>How does it work?</h3>
           <p className='text-sm mb-4'>
-            Pagá Satoshis y generá una semilla aleatoria. Si alguna de las {SATOSHI_NUMBER_ADDRESS} primeras direcciones
-            derivadas tiene balance, ¡te llevas todo lo que contenga!
+            Pay Satoshis and generate a random seed. If any of the first {SATOSHI_NUMBER_ADDRESS} addresses derived have
+            a balance, you get everything inside!
           </p>
           <motion.div
             className='bg-card p-3 rounded-lg mb-4'
             whileHover={{ scale: 1.02 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <p className='text-sm font-medium text-muted-foreground'>Precio por juego:</p>
+            <p className='text-sm font-medium text-muted-foreground'>Price per game:</p>
             <div className='flex items-center justify-center text-orange-500'>
               <SatoshiIcon className='size-6' />
               <p className='text-2xl font-bold'>{VALUE_PER_GAME} SAT</p>
@@ -89,12 +91,12 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
               {isProcessing ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Procesando pago...
+                  Processing payment...
                 </>
               ) : (
                 <>
                   <Zap className='mr-2 h-5 w-5' />
-                  Pagar y Jugar
+                  Pay and Play
                 </>
               )}
             </Button>
@@ -107,8 +109,13 @@ export default function PaymentScreen({ onPaymentComplete }: PaymentScreenProps)
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
         >
-          <p>Al jugar, aceptas los términos y condiciones del servicio.</p>
-          <p>@unllamas - Todos los derechos reservados</p>
+          <p>
+            By
+            <Button className='px-1 text-xs' variant='link' asChild>
+              <Link href='https://x.com/unllamas'>@unllamas</Link>
+            </Button>
+            - All rights reserved
+          </p>
         </motion.div>
       </div>
     </motion.div>

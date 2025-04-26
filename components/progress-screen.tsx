@@ -16,7 +16,7 @@ interface ProgressScreenProps {
 }
 
 export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenProps) {
-  const [statusMessage, setStatusMessage] = useState('Iniciando proceso...');
+  const [statusMessage, setStatusMessage] = useState('Starting process...');
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -24,10 +24,10 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
       try {
         // Paso 1: Generar semilla y mostrar mensajes iniciales
         const steps = [
-          '🔐 Generando semilla aleatoria...',
-          '📦 Derivando clave maestra...',
-          '🔍 Generando dirección principal...',
-          '🎯 Preparando verificación de direcciones...',
+          '🔐 Generating random seed...',
+          '📦 Deriving master key...',
+          '🔍 Generating main address...',
+          '🎯 Preparing address verification...',
         ];
 
         for (let i = 0; i < steps.length; i++) {
@@ -37,12 +37,12 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         }
 
         // Paso 2: Generar las SATOSHI_NUMBER_ADDRESS direcciones reales
-        setStatusMessage('🔄 Generando direcciones Bitcoin...');
+        setStatusMessage('🔄 Generating Bitcoin addresses...');
         const generatedAddresses = await generateMultipleSegWitAddresses(mnemonic, SATOSHI_NUMBER_ADDRESS);
 
         // Paso 3: Verificar el balance de cada dirección
         for (let i = 0; i < generatedAddresses.length; i++) {
-          setStatusMessage(`🔍 Verificando dirección #${i + 1}...`);
+          setStatusMessage(`🔍 Verifying address #${i + 1}...`);
           setProgress(Math.floor(((steps.length + i) / (steps.length + SATOSHI_NUMBER_ADDRESS)) * 100));
 
           // Verificar el balance real usando la función checkAddressBalance
@@ -50,7 +50,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
 
           // Si encontramos una dirección con balance, completamos el proceso
           if (balance > 0) {
-            setStatusMessage(`🔥 ¡Balance encontrado!`);
+            setStatusMessage(`🔥 Balance found!`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             onComplete(true, {
@@ -66,13 +66,13 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
         }
 
         // Si llegamos aquí, no se encontró balance en ninguna dirección
-        setStatusMessage('Verificación completa.');
+        setStatusMessage('Complete verification.');
         setProgress(100);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         onComplete(false);
       } catch (error) {
-        console.error('Error al verificar direcciones:', error);
-        setStatusMessage('❌ Error al verificar direcciones. Inténtalo de nuevo.');
+        console.error('Error verifying addresses:', error);
+        setStatusMessage('❌ Error verifying addresses. Please try again..');
         await new Promise((resolve) => setTimeout(resolve, 1000));
         onComplete(false);
       }
@@ -88,9 +88,9 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
       <div>
         <div className='flex flex-col gap-2 py-6'>
           <h2 className='text-2xl font-semibold leading-none tracking-tight text-center text-orange-500 text-shadow'>
-            Verificando Direcciones
+            Verifying Addresses
           </h2>
-          <p className='text-sm text-muted-foreground text-center'>Buscando balance en las direcciones derivadas</p>
+          <p className='text-sm text-muted-foreground text-center'>Seeking balance in derived directions</p>
         </div>
         <div className='space-y-6 py-6'>
           <motion.div
@@ -130,7 +130,7 @@ export default function ProgressScreen({ mnemonic, onComplete }: ProgressScreenP
               <div className='relative w-full'>
                 <Progress value={progress} className='h-3 bg-orange-200/20 progress-shine' />
               </div>
-              <p className='text-xs text-right mt-1 text-orange-400'>{progress}% completado</p>
+              <p className='text-xs text-right mt-1 text-orange-400'>{progress}% filled</p>
             </div>
           </motion.div>
         </div>
